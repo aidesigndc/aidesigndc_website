@@ -90,14 +90,14 @@ body {
     <input type="file" id="imageUpload" multiple accept="image/*">
     <br><br>
     <label>Main Image Index (1-5):</label>
-    <input type="number" id="mainIndex" min="1" max="5" value="1">
+    <input type="number" id="mainIndex" min="1" max="5" value="0">
     <button id="applyBtn">Apply Images</button>
 </div>
 
 <!-- PROJECT DISPLAY -->
 <div class="project">
     <div class="project-item">
-        <img src="" class="main-image" alt="Main">
+        <img src="https://via.placeholder.com/200" class="main-image" alt="Main">
         <div class="extra-images"></div>
     </div>
 </div>
@@ -106,7 +106,7 @@ body {
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-// ===== Replace these with your Supabase project URL and anon key =====
+// ===== REPLACE THESE with your Supabase project URL and anon/public key =====
 const supabaseUrl = "https://akxfknwujratwjolwwar.supabase.co";
 const supabaseKey = "sb_publishable_v6_XC8fxKYba0GJo8otcKQ_dN9mSpnS";
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -126,7 +126,7 @@ window.checkPassword = function() {
 // --- Upload images ---
 async function applyImages() {
     const files = document.getElementById("imageUpload").files;
-    const mainIndex = document.getElementById("mainIndex").value - 1;
+    const mainIndex = parseInt(document.getElementById("mainIndex").value);
     if(files.length === 0) return;
 
     const mainImage = document.querySelector(".project-item .main-image");
@@ -137,9 +137,10 @@ async function applyImages() {
 
     for(let i=0; i<files.length; i++){
         const file = files[i];
-        const safeName = file.name.replace(/\s/g, "_"); // replace spaces with _
+        const safeName = file.name.replace(/\s/g, "_");
         const fileName = `${Date.now()}_${safeName}`;
 
+        // Upload to Supabase bucket 'images'
         const { data, error } = await supabase.storage
             .from('images')
             .upload(fileName, file, { cacheControl: '3600', upsert: false });
@@ -149,13 +150,15 @@ async function applyImages() {
             continue;
         }
 
-        const { publicUrl } = supabase.storage
+        // Get public URL
+        const { data: publicData } = supabase.storage
             .from('images')
             .getPublicUrl(fileName);
 
-        urls.push(publicUrl);
+        urls.push(publicData.publicUrl);
     }
 
+    // Populate main + extra images
     urls.forEach((url,i)=>{
         if(i === mainIndex){
             mainImage.src = url;
