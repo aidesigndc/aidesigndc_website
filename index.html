@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>A&I am owed bread Design</title>
+<title>Document</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@100..900&display=swap');
@@ -36,10 +36,8 @@ body{
 
 .main-image{
     width:200px;
-    height:200px;
-    object-fit:cover;
+    height:auto;
     cursor:pointer;
-    display:block;
 }
 
 .extra-images{
@@ -48,6 +46,14 @@ body{
     left:220px;
     display:flex;
     gap:10px;
+}
+
+.main-image{
+    width:200px;
+    height:200px;
+    object-fit:cover;
+    cursor:pointer;
+    display:block;
 }
 
 .extra-images img{
@@ -71,12 +77,14 @@ body{
 }
 
 /* hidden admin panel */
+
 #uploadControls{
-    display:none;
-    margin-bottom:40px;
-    border:1px solid #ccc;
-    padding:20px;
+display:none;
+margin-bottom:40px;
+border:1px solid #ccc;
+padding:20px;
 }
+
 </style>
 </head>
 
@@ -86,87 +94,123 @@ body{
 <h1>A&I am owed bread Design</h1>
 </div>
 
-<!-- Admin Upload Panel -->
 <div id="uploadControls">
-    <input type="file" id="imageUpload" multiple accept="image/*">
-    <br><br>
-    <label>Main Image Index (1-5):</label>
-    <input type="number" id="mainIndex" min="1" max="5" value="1">
-    <button onclick="applyImages()">Apply Images</button>
+
+<input type="file" id="imageUpload" multiple accept="image/*">
+
+<br><br>
+
+<label>Main Image Index (1-5):</label>
+<input type="number" id="mainIndex" min="1" max="5" value="1">
+
+<button onclick="applyImages()">Apply Images</button>
+
 </div>
 
-<!-- Gallery -->
-<div class="project" id="gallery">
-    <!-- Project items will be appended here after upload -->
+<div class="project">
+
+<div class="project-item">
+<img src="../images/chair.webp" class="main-image">
+<div class="extra-images">
+<img src="../images/chair2.webp">
+<img src="../images/image3.jpg">
+<img src="../images/whiteM.png">
+<img src="../images/chair7.jpg">
+</div>
+</div>
+
+<div class="project-item">
+<img src="../images/chair2.webp" class="main-image">
+<div class="extra-images">
+<img src="../images/chair.webp">
+<img src="../images/image3.jpg">
+<img src="../images/whiteM.png">
+<img src="../images/chair2.webp">
+</div>
+</div>
+
+<div class="project-item">
+<img src="../images/image3.jpg" class="main-image">
+<div class="extra-images">
+<img src="../images/chair.webp">
+<img src="../images/chair2.webp">
+<img src="../images/whiteM.png">
+<img src="../images/chair2.webp">
+</div>
+</div>
+
+<div class="project-item">
+<img src="../images/whiteM.png" class="main-image">
+<div class="extra-images">
+<img src="../images/chair.webp">
+<img src="../images/chair2.webp">
+<img src="../images/image3.jpg">
+<img src="../images/chair2.webp">
+</div>
+</div>
+
 </div>
 
 <script>
-// Admin Shortcut: Shift+U
+
+/* SECRET ADMIN SHORTCUT */
+
 document.addEventListener("keydown", function(e){
-    if(e.shiftKey && e.key.toLowerCase() === "u"){
-        let password = prompt("Enter admin password");
-        if(password === "ihateschool"){
-            document.getElementById("uploadControls").style.display = "block";
-        } else {
-            alert("Incorrect password");
-        }
-    }
-});
 
-// Upload images to Cloudflare Worker → GitHub
-async function applyImages(){
-    const files = document.getElementById("imageUpload").files;
-    if(files.length === 0){
-        alert("No files selected");
-        return;
-    }
+if(e.shiftKey && e.key.toLowerCase() === "u"){
 
-    const workerURL = "https://test.eliasgiorhee.workers.dev/"; // <-- Replace with your Worker URL
-    const gallery = document.getElementById("gallery");
-    gallery.innerHTML = ""; // clear previous gallery
+let password = prompt("Enter admin password")
 
-    const mainIndex = parseInt(document.getElementById("mainIndex").value) - 1;
+if(password === "ihateschool"){
 
-    for(let i=0; i<files.length; i++){
-        const file = files[i];
-        const reader = new FileReader();
-        reader.onload = async function(){
-            const base64 = reader.result.split(",")[1];
+document.getElementById("uploadControls").style.display = "block"
 
-            // Send to Worker
-            const res = await fetch(workerURL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    filename: file.name,
-                    contentBase64: base64
-                })
-            });
-            const data = await res.json();
-            console.log(data);
+}else{
 
-            // Add to gallery
-            const itemDiv = document.createElement("div");
-            itemDiv.classList.add("project-item");
+alert("Incorrect password")
 
-            const imgMain = document.createElement("img");
-            imgMain.src = `https://raw.githubusercontent.com/aidesigndc/aidesigndc_website/main/images/${file.name}`;
-            imgMain.classList.add("main-image");
-            if(i === mainIndex) imgMain.style.border = "3px solid maroon";
-
-            const extraDiv = document.createElement("div");
-            extraDiv.classList.add("extra-images");
-            extraDiv.appendChild(imgMain.cloneNode()); // extra image for hover
-
-            itemDiv.appendChild(imgMain);
-            itemDiv.appendChild(extraDiv);
-            gallery.appendChild(itemDiv);
-        }
-        reader.readAsDataURL(file);
-    }
-
-    alert("Uploading to GitHub... check your repo in a few seconds");
 }
+
+}
+
+})
+
+/* IMAGE UPLOAD SYSTEM */
+
+function applyImages(){
+
+const files = document.getElementById("imageUpload").files
+const mainIndex = document.getElementById("mainIndex").value - 1
+
+if(files.length === 0) return
+
+let urls = []
+
+for(let i=0;i<files.length;i++){
+urls.push(URL.createObjectURL(files[i]))
+}
+
+const mainImage = document.querySelector(".project-item .main-image")
+const extraContainer = document.querySelector(".project-item .extra-images")
+
+extraContainer.innerHTML = ""
+
+urls.forEach((url,i)=>{
+
+if(i === mainIndex){
+mainImage.src = url
+}else{
+
+const img = document.createElement("img")
+img.src = url
+extraContainer.appendChild(img)
+
+}
+
+})
+
+}
+
 </script>
 
 </body>
