@@ -17,7 +17,7 @@ body{
 .project{
     display:flex;
     flex-direction:column;
-    gap:20px;
+    gap:5px;
     width:100%;
 }
 .logo{
@@ -31,38 +31,29 @@ body{
     position:relative;
     display:flex;
     flex-direction:column;
-    gap:10px;
-    margin-bottom:40px;
+    gap:4px;
+    margin-bottom:20px;
     align-items:center;
 }
-.main-image-container{
+.main-image{
     width:100%;
-    position:relative;
-    padding-top:100%; /* square */
-}
-.main-image-container img{
-    position:absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
+    height:0;
+    padding-top:100%;
     object-fit:cover;
     cursor:pointer;
 }
 .extra-images{
     display:flex;
+    gap:4px;
     flex-wrap:wrap;
-    gap:10px;
     justify-content:center;
-    width:100%;
 }
 .extra-images img{
-    flex:1 1 calc(33% - 10px);
-    max-width:200px;
-    height:auto;
+    height:200px;
+    width:auto;
     object-fit:cover;
     opacity:0;
-    transform:translateY(-10px);
+    transform:translateX(-20px);
     transition:opacity 0.4s ease, transform 0.4s ease;
 }
 .extra-images img:nth-child(1){ transition-delay:0.05s; }
@@ -73,7 +64,7 @@ body{
 .project-item:hover .extra-images img,
 .project-item.active .extra-images img{
     opacity:1;
-    transform:translateY(0);
+    transform:translateX(0);
 }
 #floatingLogo{
     position:fixed;
@@ -89,9 +80,14 @@ body{
         margin:15px;
         align-items:flex-start;
     }
+    .main-image{
+        width:100%;
+        height:0;
+        padding-top:100%;
+    }
     .extra-images img{
-        flex:1 1 calc(50% - 10px);
-        max-width:150px;
+        height:150px;
+        width:auto;
     }
     #floatingLogo{
         width:60px;
@@ -116,79 +112,62 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const supabaseUrl="https://akxfknwujratwjolwwar.supabase.co";
 const supabaseKey="sb_publishable_v6_XC8fxKYba0GJo8otcKQ_dN9mSpnS";
 const supabase=createClient(supabaseUrl,supabaseKey);
-
 document.addEventListener("keydown",(e)=>{
-    if(e.shiftKey && e.key.toLowerCase()==="u"){
-        const controls=document.getElementById("uploadControls");
-        controls.style.display=controls.style.display==="none" ? "block" : "none";
-    }
+if(e.shiftKey && e.key.toLowerCase()==="u"){
+const controls=document.getElementById("uploadControls");
+controls.style.display=controls.style.display==="none" ? "block" : "none";
+}
 });
-
 function createProjectItem(urls,mainIndex=0){
-    const projectContainer=document.getElementById("projectContainer");
-    const newItem=document.createElement("div");
-    newItem.classList.add("project-item");
-
-    const mainUrl=urls[mainIndex]||urls[0];
-    const mainContainer=document.createElement("div");
-    mainContainer.classList.add("main-image-container");
-
-    const mainImg=document.createElement("img");
-    mainImg.src=mainUrl;
-    mainImg.addEventListener("click", () => {
-        document.querySelectorAll('.project-item.active').forEach(item => {
-            if(item!==newItem)item.classList.remove('active');
-        });
-        newItem.classList.toggle('active');
-    });
-
-    mainContainer.appendChild(mainImg);
-    newItem.appendChild(mainContainer);
-
-    const extraDiv=document.createElement("div");
-    extraDiv.classList.add("extra-images");
-    urls.forEach((url,i)=>{
-        if(i!==mainIndex){
-            const img=document.createElement("img");
-            img.src=url;
-            extraDiv.appendChild(img);
-        }
-    });
-
-    newItem.appendChild(extraDiv);
-    projectContainer.appendChild(newItem);
-}
-
-async function applyImages(){
-    const files=document.getElementById("imageUpload").files;
-    let mainIndex=parseInt(document.getElementById("mainIndex").value)-1;
-    mainIndex=Math.max(0,Math.min(mainIndex,files.length-1));
-    if(files.length===0)return;
-
-    let uploadedUrls=[];
-    for(let i=0;i<files.length;i++){
-        const file=files[i];
-        const safeName=file.name.replace(/\s/g,"_");
-        const fileName=`${Date.now()}_${safeName}`;
-        const { error }=await supabase.storage.from('images').upload(fileName,file);
-        if(error){console.error(error);continue;}
-        const { data }=supabase.storage.from('images').getPublicUrl(fileName);
-        uploadedUrls.push(data.publicUrl);
-    }
-
-    await supabase.from("projects").insert([{images:uploadedUrls,main_index:mainIndex}]);
-    createProjectItem(uploadedUrls,mainIndex);
-}
-
-document.getElementById("applyBtn").addEventListener("click",(e)=>{
-    e.preventDefault();
-    applyImages();
+const projectContainer=document.getElementById("projectContainer");
+const newItem=document.createElement("div");
+newItem.classList.add("project-item");
+const mainUrl=urls[mainIndex]||urls[0];
+const mainImg=document.createElement("img");
+mainImg.classList.add("main-image");
+mainImg.src=mainUrl;
+mainImg.addEventListener("click", () => {
+document.querySelectorAll('.project-item.active').forEach(item => {
+if(item!==newItem)item.classList.remove('active');
 });
-
+newItem.classList.toggle('active');
+});
+newItem.appendChild(mainImg);
+const extraDiv=document.createElement("div");
+extraDiv.classList.add("extra-images");
+urls.forEach((url,i)=>{
+if(i!==mainIndex){
+const img=document.createElement("img");
+img.src=url;
+extraDiv.appendChild(img);
+}
+});
+newItem.appendChild(extraDiv);
+projectContainer.appendChild(newItem);
+}
+async function applyImages(){
+const files=document.getElementById("imageUpload").files;
+let mainIndex=parseInt(document.getElementById("mainIndex").value)-1;
+mainIndex=Math.max(0,Math.min(mainIndex,files.length-1));
+if(files.length===0)return;
+let uploadedUrls=[];
+for(let i=0;i<files.length;i++){
+const file=files[i];
+const safeName=file.name.replace(/\s/g,"_");
+const fileName=`${Date.now()}_${safeName}`;
+const { error }=await supabase.storage.from('images').upload(fileName,file);
+if(error){console.error(error);continue;}
+const { data }=supabase.storage.from('images').getPublicUrl(fileName);
+uploadedUrls.push(data.publicUrl);
+}
+await supabase.from("projects").insert([{images:uploadedUrls,main_index:mainIndex}]);
+createProjectItem(uploadedUrls,mainIndex);
+}
+document.getElementById("applyBtn").addEventListener("click",(e)=>{e.preventDefault();applyImages();});
 window.addEventListener("DOMContentLoaded",async()=>{
-    const { data,error }=await supabase.from("projects").select("*").order("created_at",{ascending:true});
-    if(error){console.error(error);return;}
-    data.forEach(project=>{createProjectItem(project.images,project.main_index);});
+const { data,error }=await supabase.from("projects").select("*").order("created_at",{ascending:true});
+if(error){console.error(error);return;}
+data.forEach(project=>{createProjectItem(project.images,project.main_index);});
 });
 </script>
 <img src="logonew.png" id="floatingLogo">
