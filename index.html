@@ -17,13 +17,15 @@ body{
 .project{
     display:flex;
     flex-direction:column;
-    gap:5px;
+    gap:20px;
     width:100%;
 }
 .logo{
     font-size:20px;
     margin-bottom:40px;
     color:maroon;
+    text-align:center;
+    width:100%;
 }
 .project-item{
     position:relative;
@@ -31,6 +33,7 @@ body{
     flex-direction:row;
     gap:4px;
     margin-bottom:20px;
+    align-items:flex-start;
 }
 .main-image{
     width:200px;
@@ -41,13 +44,14 @@ body{
 .extra-images{
     display:flex;
     gap:4px;
+    flex-wrap:wrap;
 }
 .extra-images img{
     height:200px;
     width:auto;
     object-fit:cover;
     opacity:0;
-    transform:translateX(-20px);
+    transform:translateY(-10px);
     transition:opacity 0.4s ease, transform 0.4s ease;
 }
 .extra-images img:nth-child(1){ transition-delay:0.05s; }
@@ -57,11 +61,11 @@ body{
 .extra-images img:nth-child(5){ transition-delay:0.45s; }
 .project-item:hover .extra-images img{
     opacity:1;
-    transform:translateX(0);
+    transform:translateY(0);
 }
 .project-item.active .extra-images img{
     opacity:1;
-    transform:translateX(0);
+    transform:translateY(0);
 }
 #floatingLogo{
     position:fixed;
@@ -72,6 +76,8 @@ body{
     z-index:1000;
     opacity:0.1;
 }
+
+/* MOBILE STYLES */
 @media (max-width:700px){
     body{
         margin:15px;
@@ -82,15 +88,27 @@ body{
     }
     .main-image{
         width:100%;
-        height:auto;
+        height:0;
+        padding-top:100%; /* square */
+        position:relative;
     }
-    .extra-images{
-        flex-wrap:wrap;
-        gap:4px;
+    .main-image-container{
+        width:100%;
+        position:relative;
+        padding-top:100%;
+    }
+    .main-image-container img{
+        position:absolute;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        object-fit:cover;
     }
     .extra-images img{
-        height:150px;
-        width:auto;
+        flex:1 1 calc(50% - 4px);
+        max-width:calc(50% - 4px);
+        height:auto;
     }
     #floatingLogo{
         width:60px;
@@ -101,7 +119,9 @@ body{
 </style>
 </head>
 <body>
+
 <div class="logo"><h1>A&I am owed bread Design</h1></div>
+
 <div id="uploadControls" style="display:none;">
 <input type="file" id="imageUpload" multiple accept="image/*">
 <br><br>
@@ -109,98 +129,97 @@ body{
 <input type="number" id="mainIndex" min="1" max="5" value="1">
 <button id="applyBtn">Upload & Display</button>
 </div>
+
 <div class="project" id="projectContainer"></div>
+
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
 const supabaseUrl="https://akxfknwujratwjolwwar.supabase.co";
 const supabaseKey="sb_publishable_v6_XC8fxKYba0GJo8otcKQ_dN9mSpnS";
 const supabase=createClient(supabaseUrl,supabaseKey);
+
 document.addEventListener("keydown",(e)=>{
-if(e.shiftKey && e.key.toLowerCase()==="u"){
-const controls=document.getElementById("uploadControls");
-controls.style.display=
-controls.style.display==="none" ? "block" : "none";
-}
+    if(e.shiftKey && e.key.toLowerCase()==="u"){
+        const controls=document.getElementById("uploadControls");
+        controls.style.display = controls.style.display==="none" ? "block" : "none";
+    }
 });
+
 function createProjectItem(urls,mainIndex=0){
-const projectContainer=document.getElementById("projectContainer");
-const newItem=document.createElement("div");
-newItem.classList.add("project-item");
-const mainUrl=urls[mainIndex]||urls[0];
-const mainImg=document.createElement("img");
-mainImg.classList.add("main-image");
-mainImg.src=mainUrl;
-mainImg.addEventListener("click", () => {
-    document.querySelectorAll('.project-item.active').forEach(item => {
-        if(item !== newItem) item.classList.remove('active');
+    const projectContainer=document.getElementById("projectContainer");
+    const newItem=document.createElement("div");
+    newItem.classList.add("project-item");
+
+    const isMobile = window.innerWidth <= 700;
+
+    const mainUrl=urls[mainIndex]||urls[0];
+    let mainImg;
+    if(isMobile){
+        const mainContainer=document.createElement("div");
+        mainContainer.classList.add("main-image-container");
+        mainImg=document.createElement("img");
+        mainImg.src=mainUrl;
+        mainImg.addEventListener("click", () => {
+            // toggle only on mobile
+            newItem.classList.toggle("active");
+        });
+        mainContainer.appendChild(mainImg);
+        newItem.appendChild(mainContainer);
+    } else {
+        mainImg=document.createElement("img");
+        mainImg.classList.add("main-image");
+        mainImg.src=mainUrl;
+        newItem.appendChild(mainImg);
+    }
+
+    const extraDiv=document.createElement("div");
+    extraDiv.classList.add("extra-images");
+    urls.forEach((url,i)=>{
+        if(i!==mainIndex){
+            const img=document.createElement("img");
+            img.src=url;
+            extraDiv.appendChild(img);
+        }
     });
-    newItem.classList.toggle("active");
-});
-newItem.appendChild(mainImg);
-const extraDiv=document.createElement("div");
-extraDiv.classList.add("extra-images");
-urls.forEach((url,i)=>{
-if(i!==mainIndex){
-const img=document.createElement("img");
-img.src=url;
-extraDiv.appendChild(img);
+    newItem.appendChild(extraDiv);
+    projectContainer.appendChild(newItem);
 }
-});
-newItem.appendChild(extraDiv);
-projectContainer.appendChild(newItem);
-}
+
 async function applyImages(){
-const files=document.getElementById("imageUpload").files;
-let mainIndex=parseInt(document.getElementById("mainIndex").value)-1;
-mainIndex=Math.max(0,Math.min(mainIndex,files.length-1));
-if(files.length===0)return;
-let uploadedUrls=[];
-for(let i=0;i<files.length;i++){
-const file=files[i];
-const safeName=file.name.replace(/\s/g,"_");
-const fileName=`${Date.now()}_${safeName}`;
-const { error }=await supabase
-.storage
-.from('images')
-.upload(fileName,file);
-if(error){
-console.error(error);
-continue;
+    const files=document.getElementById("imageUpload").files;
+    let mainIndex=parseInt(document.getElementById("mainIndex").value)-1;
+    mainIndex=Math.max(0,Math.min(mainIndex,files.length-1));
+    if(files.length===0)return;
+
+    let uploadedUrls=[];
+    for(let i=0;i<files.length;i++){
+        const file=files[i];
+        const safeName=file.name.replace(/\s/g,"_");
+        const fileName=`${Date.now()}_${safeName}`;
+        const { error } = await supabase.storage.from('images').upload(fileName,file);
+        if(error){ console.error(error); continue; }
+        const { data } = supabase.storage.from('images').getPublicUrl(fileName);
+        uploadedUrls.push(data.publicUrl);
+    }
+
+    await supabase.from("projects").insert([{images:uploadedUrls,main_index:mainIndex}]);
+    createProjectItem(uploadedUrls,mainIndex);
 }
-const { data }=supabase
-.storage
-.from('images')
-.getPublicUrl(fileName);
-uploadedUrls.push(data.publicUrl);
-}
-await supabase
-.from("projects")
-.insert([
-{
-images:uploadedUrls,
-main_index:mainIndex
-}
-]);
-createProjectItem(uploadedUrls,mainIndex);
-}
+
 document.getElementById("applyBtn").addEventListener("click",(e)=>{
-e.preventDefault();
-applyImages();
+    e.preventDefault();
+    applyImages();
 });
-window.addEventListener("DOMContentLoaded",async()=>{
-const { data,error }=await supabase
-.from("projects")
-.select("*")
-.order("created_at",{ascending:true});
-if(error){
-console.error(error);
-return;
-}
-data.forEach(project=>{
-createProjectItem(project.images,project.main_index);
-});
+
+window.addEventListener("DOMContentLoaded", async ()=>{
+    const { data,error } = await supabase.from("projects").select("*").order("created_at",{ascending:true});
+    if(error){ console.error(error); return; }
+    data.forEach(project=>{ createProjectItem(project.images, project.main_index); });
 });
 </script>
+
 <img src="images/logo.png" id="floatingLogo">
+
 </body>
 </html>
