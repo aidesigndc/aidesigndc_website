@@ -7,49 +7,58 @@
 <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@100..900&display=swap" rel="stylesheet">
 
 <style>
-body {
+
+body{
     display:flex;
     flex-direction:column;
-    align-items:flex-start;
+    align-items:center;
     font-family:'Times New Roman', Times, serif;
-    margin:40px;
-    margin-left:40vh;
+    margin:40px auto;
+    max-width:900px;
 }
 
-.project {
+/* MAIN PROJECT COLUMN */
+
+.project{
     display:flex;
     flex-direction:column;
-    gap:40px;
+    gap:5px;
     width:100%;
 }
 
-.logo {
+.logo{
     font-size:20px;
     margin-bottom:40px;
     color:maroon;
 }
 
-.project-item {
+/* IMAGE ROW */
+
+.project-item{
     position:relative;
     display:flex;
     flex-direction:row;
-    gap:10px;
+    gap:4px;
     margin-bottom:20px;
 }
 
-.main-image {
+/* MAIN IMAGE */
+
+.main-image{
     width:200px;
     height:200px;
     object-fit:cover;
     cursor:pointer;
 }
 
-.extra-images {
+/* EXTRA IMAGES */
+
+.extra-images{
     display:flex;
-    gap:10px;
+    gap:4px;
 }
 
-.extra-images img {
+.extra-images img{
     height:200px;
     object-fit:cover;
     opacity:0;
@@ -57,16 +66,66 @@ body {
     transition:opacity 0.4s ease, transform 0.4s ease;
 }
 
+#floatingLogo{
+    position:fixed;
+    bottom:20px;
+    left:70px;
+    width:100px;
+    height:auto;
+    z-index:1000;
+    opacity:0.1;
+}
+
+/* HOVER ANIMATION */
+
 .extra-images img:nth-child(1){ transition-delay:0.05s; }
 .extra-images img:nth-child(2){ transition-delay:0.15s; }
 .extra-images img:nth-child(3){ transition-delay:0.25s; }
 .extra-images img:nth-child(4){ transition-delay:0.35s; }
 .extra-images img:nth-child(5){ transition-delay:0.45s; }
 
-.project-item:hover .extra-images img {
+.project-item:hover .extra-images img{
     opacity:1;
     transform:translateX(0);
 }
+
+/* MOBILE */
+
+@media (max-width:700px){
+
+body{
+    margin:15px;
+    align-items:flex-start;
+}
+
+.project-item{
+    flex-direction:column;
+}
+
+.main-image{
+    width:100%;
+    height:auto;
+}
+
+.extra-images{
+    flex-wrap:wrap;
+}
+
+.extra-images img{
+    width:32%;
+    height:auto;
+    opacity:1;
+    transform:none;
+}
+
+#floatingLogo{
+    width:60px;
+    left:10px;
+    bottom:10px;
+}
+
+}
+
 </style>
 </head>
 
@@ -77,8 +136,8 @@ body {
 <div id="uploadControls" style="display:none;">
 <input type="file" id="imageUpload" multiple accept="image/*">
 <br><br>
-<label>Main Image Index (0-based):</label>
-<input type="number" id="mainIndex" min="0" value="0">
+<label>Main Image (1 = first):</label>
+<input type="number" id="mainIndex" min="1" max="5" value="1">
 <button id="applyBtn">Upload & Display</button>
 </div>
 
@@ -92,140 +151,135 @@ const supabaseUrl = "https://akxfknwujratwjolwwar.supabase.co";
 const supabaseKey = "sb_publishable_v6_XC8fxKYba0GJo8otcKQ_dN9mSpnS";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-
 /* SHIFT + U toggle */
 
-document.addEventListener("keydown", (e) => {
+document.addEventListener("keydown",(e)=>{
 
-    if(e.shiftKey && e.key.toLowerCase() === "u"){
+if(e.shiftKey && e.key.toLowerCase()==="u"){
 
-        const controls = document.getElementById("uploadControls");
+const controls=document.getElementById("uploadControls");
 
-        if(controls.style.display === "none"){
-            controls.style.display = "block";
-        } else {
-            controls.style.display = "none";
-        }
-
-    }
-
-});
-
-
-function createProjectItem(urls, mainIndex = 0){
-
-    const projectContainer = document.getElementById("projectContainer");
-
-    const newItem = document.createElement("div");
-    newItem.classList.add("project-item");
-
-    const mainUrl = urls[mainIndex] || urls[0];
-
-    const mainImg = document.createElement("img");
-    mainImg.classList.add("main-image");
-    mainImg.src = mainUrl;
-
-    newItem.appendChild(mainImg);
-
-    const extraDiv = document.createElement("div");
-    extraDiv.classList.add("extra-images");
-
-    urls.forEach((url, i) => {
-
-        if(i !== mainIndex){
-
-            const img = document.createElement("img");
-            img.src = url;
-
-            extraDiv.appendChild(img);
-
-        }
-
-    });
-
-    newItem.appendChild(extraDiv);
-
-    projectContainer.appendChild(newItem);
+controls.style.display =
+controls.style.display==="none" ? "block" : "none";
 
 }
 
+});
+
+function createProjectItem(urls,mainIndex=0){
+
+const projectContainer=document.getElementById("projectContainer");
+
+const newItem=document.createElement("div");
+newItem.classList.add("project-item");
+
+const mainUrl=urls[mainIndex]||urls[0];
+
+const mainImg=document.createElement("img");
+mainImg.classList.add("main-image");
+mainImg.src=mainUrl;
+
+newItem.appendChild(mainImg);
+
+const extraDiv=document.createElement("div");
+extraDiv.classList.add("extra-images");
+
+urls.forEach((url,i)=>{
+
+if(i!==mainIndex){
+
+const img=document.createElement("img");
+img.src=url;
+
+extraDiv.appendChild(img);
+
+}
+
+});
+
+newItem.appendChild(extraDiv);
+
+projectContainer.appendChild(newItem);
+
+}
 
 async function applyImages(){
 
-    const files = document.getElementById("imageUpload").files;
-    const mainIndex = parseInt(document.getElementById("mainIndex").value);
+const files=document.getElementById("imageUpload").files;
 
-    if(files.length === 0) return;
+let mainIndex=parseInt(document.getElementById("mainIndex").value)-1;
+mainIndex=Math.max(0,Math.min(mainIndex,files.length-1));
 
-    let uploadedUrls = [];
+if(files.length===0)return;
 
-    for(let i=0;i<files.length;i++){
+let uploadedUrls=[];
 
-        const file = files[i];
-        const safeName = file.name.replace(/\s/g,"_");
-        const fileName = `${Date.now()}_${safeName}`;
+for(let i=0;i<files.length;i++){
 
-        const { error } = await supabase
-            .storage
-            .from('images')
-            .upload(fileName, file);
+const file=files[i];
+const safeName=file.name.replace(/\s/g,"_");
+const fileName=`${Date.now()}_${safeName}`;
 
-        if(error){
-            console.error(error);
-            continue;
-        }
+const { error }=await supabase
+.storage
+.from('images')
+.upload(fileName,file);
 
-        const { data } = supabase
-            .storage
-            .from('images')
-            .getPublicUrl(fileName);
+if(error){
+console.error(error);
+continue;
+}
 
-        uploadedUrls.push(data.publicUrl);
+const { data }=supabase
+.storage
+.from('images')
+.getPublicUrl(fileName);
 
-    }
-
-
-    await supabase
-        .from("projects")
-        .insert([
-            {
-                images: uploadedUrls,
-                main_index: mainIndex
-            }
-        ]);
-
-    createProjectItem(uploadedUrls, mainIndex);
+uploadedUrls.push(data.publicUrl);
 
 }
 
+await supabase
+.from("projects")
+.insert([
+{
+images:uploadedUrls,
+main_index:mainIndex
+}
+]);
 
-document.getElementById("applyBtn").addEventListener("click", e => {
+createProjectItem(uploadedUrls,mainIndex);
 
-    e.preventDefault();
-    applyImages();
+}
+
+document.getElementById("applyBtn").addEventListener("click",(e)=>{
+
+e.preventDefault();
+applyImages();
 
 });
 
+window.addEventListener("DOMContentLoaded",async()=>{
 
-window.addEventListener("DOMContentLoaded", async () => {
+const { data,error }=await supabase
+.from("projects")
+.select("*")
+.order("created_at",{ ascending:true });
 
-    const { data, error } = await supabase
-        .from("projects")
-        .select("*")
-        .order("created_at", { ascending: true });
+if(error){
+console.error(error);
+return;
+}
 
-    if(error){
-        console.error(error);
-        return;
-    }
-
-    data.forEach(project => {
-        createProjectItem(project.images, project.main_index);
-    });
+data.forEach(project=>{
+createProjectItem(project.images,project.main_index);
+});
 
 });
 
 </script>
+
+<img src="logo.png" id="floatingLogo">
 
 </body>
 </html>
