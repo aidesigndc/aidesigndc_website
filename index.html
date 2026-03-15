@@ -41,6 +41,7 @@ body{
     padding-top:100%;
     object-fit:cover;
     cursor:pointer;
+    position:relative;
 }
 .extra-images{
     display:flex;
@@ -112,12 +113,14 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const supabaseUrl="https://akxfknwujratwjolwwar.supabase.co";
 const supabaseKey="sb_publishable_v6_XC8fxKYba0GJo8otcKQ_dN9mSpnS";
 const supabase=createClient(supabaseUrl,supabaseKey);
+
 document.addEventListener("keydown",(e)=>{
 if(e.shiftKey && e.key.toLowerCase()==="u"){
 const controls=document.getElementById("uploadControls");
 controls.style.display=controls.style.display==="none" ? "block" : "none";
 }
 });
+
 function createProjectItem(urls,mainIndex=0){
 const projectContainer=document.getElementById("projectContainer");
 const newItem=document.createElement("div");
@@ -145,6 +148,7 @@ extraDiv.appendChild(img);
 newItem.appendChild(extraDiv);
 projectContainer.appendChild(newItem);
 }
+
 async function applyImages(){
 const files=document.getElementById("imageUpload").files;
 let mainIndex=parseInt(document.getElementById("mainIndex").value)-1;
@@ -163,7 +167,9 @@ uploadedUrls.push(data.publicUrl);
 await supabase.from("projects").insert([{images:uploadedUrls,main_index:mainIndex}]);
 createProjectItem(uploadedUrls,mainIndex);
 }
+
 document.getElementById("applyBtn").addEventListener("click",(e)=>{e.preventDefault();applyImages();});
+
 window.addEventListener("DOMContentLoaded",async()=>{
 const { data,error }=await supabase.from("projects").select("*").order("created_at",{ascending:true});
 if(error){console.error(error);return;}
