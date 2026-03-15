@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>A&I Design</title>
-<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@100..900&display=swap" rel="stylesheet">
 <style>
 body{
     display:flex;
@@ -33,7 +32,6 @@ body{
     flex-direction:row;
     gap:4px;
     margin-bottom:20px;
-    align-items:flex-start;
 }
 .main-image{
     width:200px;
@@ -43,25 +41,19 @@ body{
 }
 .extra-images{
     display:flex;
-    gap:4px;
     flex-wrap:wrap;
-    transform-origin: top left;
+    gap:4px;
 }
 .extra-images img{
     height:200px;
     width:auto;
     object-fit:cover;
     opacity:0;
-    transform:scale(0.5);
+    transform:translateX(0px);
     transition:opacity 0.4s ease, transform 0.4s ease;
 }
-.project-item:hover .extra-images img{
+.project-item.show-extras .extra-images img{
     opacity:1;
-    transform:scale(1);
-}
-.project-item.active .extra-images img{
-    opacity:1;
-    transform:scale(1);
 }
 #floatingLogo{
     position:fixed;
@@ -73,6 +65,7 @@ body{
     opacity:0.1;
 }
 
+/* MOBILE */
 @media (max-width:700px){
     body{
         margin:15px;
@@ -101,8 +94,8 @@ body{
         object-fit:cover;
     }
     .extra-images img{
-        height:150px; /* same height */
-        width:auto;   /* natural width */
+        height:150px;
+        width:auto;
     }
     #floatingLogo{
         width:60px;
@@ -113,7 +106,6 @@ body{
 </style>
 </head>
 <body>
-
 <div class="logo"><h1>A&I am owed bread Design</h1></div>
 
 <div id="uploadControls" style="display:none;">
@@ -127,11 +119,12 @@ body{
 <div class="project" id="projectContainer"></div>
 
 <script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 const supabaseUrl="https://akxfknwujratwjolwwar.supabase.co";
 const supabaseKey="sb_publishable_v6_XC8fxKYba0GJo8otcKQ_dN9mSpnS";
 const supabase=createClient(supabaseUrl,supabaseKey);
 
+// Toggle upload controls
 document.addEventListener("keydown",(e)=>{
     if(e.shiftKey && e.key.toLowerCase()==="u"){
         const controls=document.getElementById("uploadControls");
@@ -146,23 +139,23 @@ function createProjectItem(urls,mainIndex=0){
 
     const isMobile = window.innerWidth <= 700;
 
-    const mainUrl = urls[mainIndex]||urls[0];
+    // Main image
     let mainImg;
-
     if(isMobile){
         const mainContainer=document.createElement("div");
         mainContainer.classList.add("main-image-container");
         mainImg=document.createElement("img");
-        mainImg.src = mainUrl;
+        mainImg.src = urls[mainIndex]||urls[0];
 
-        mainImg.addEventListener("click", ()=>{
-            const currentlyActive = newItem.classList.contains("active");
-            // hide all other active extra images first
-            document.querySelectorAll('.project-item.active').forEach(item => {
-                if(item !== newItem) item.classList.remove("active");
+        mainImg.addEventListener("click",()=>{
+            const active = newItem.classList.contains("show-extras");
+            // hide all others
+            document.querySelectorAll('.project-item.show-extras').forEach(item=>{
+                if(item!==newItem)item.classList.remove("show-extras");
             });
-            if(!currentlyActive) newItem.classList.add("active");
-            else newItem.classList.remove("active");
+            newItem.classList.toggle("show-extras");
+            // apply staggered delays
+            updateExtraDelays(newItem);
         });
 
         mainContainer.appendChild(mainImg);
@@ -170,13 +163,23 @@ function createProjectItem(urls,mainIndex=0){
     } else {
         mainImg=document.createElement("img");
         mainImg.classList.add("main-image");
-        mainImg.src = mainUrl;
+        mainImg.src = urls[mainIndex]||urls[0];
         newItem.appendChild(mainImg);
+
+        // desktop hover: add show-extras on hover
+        newItem.addEventListener("mouseenter",()=>{ 
+            newItem.classList.add("show-extras"); 
+            updateExtraDelays(newItem);
+        });
+        newItem.addEventListener("mouseleave",()=>{ 
+            newItem.classList.remove("show-extras"); 
+            updateExtraDelays(newItem,true); 
+        });
     }
 
+    // Extra images
     const extraDiv = document.createElement("div");
     extraDiv.classList.add("extra-images");
-
     urls.forEach((url,i)=>{
         if(i!==mainIndex){
             const img=document.createElement("img");
@@ -184,9 +187,18 @@ function createProjectItem(urls,mainIndex=0){
             extraDiv.appendChild(img);
         }
     });
-
     newItem.appendChild(extraDiv);
     projectContainer.appendChild(newItem);
+}
+
+function updateExtraDelays(item,reverse=false){
+    const imgs = Array.from(item.querySelectorAll('.extra-images img'));
+    imgs.forEach((img,i)=>{
+        const total = imgs.length;
+        let idx = reverse ? total-1-i : i;
+        img.style.transitionDelay = `${idx*0.1}s`;
+        img.style.transform = item.classList.contains('show-extras') ? 'translateX(0)' : 'translateX(-20px)';
+    });
 }
 
 async function applyImages(){
