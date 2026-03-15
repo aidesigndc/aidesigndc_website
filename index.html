@@ -32,10 +32,9 @@ body{
     gap:4px;
     margin-bottom:20px;
 }
-.main-image {
-    width:100%;    
-    max-width:400px; 
-    height:150px;
+.main-image{
+    width:200px;
+    height:200px;
     object-fit:cover;
     cursor:pointer;
 }
@@ -82,8 +81,9 @@ body{
         flex-direction:column;
     }
     .main-image{
-        width:100%;
-        height:auto;
+        height:150px;
+        width:auto;
+        object-fit:cover;
     }
     .extra-images{
         flex-wrap:wrap;
@@ -119,8 +119,7 @@ const supabase=createClient(supabaseUrl,supabaseKey);
 document.addEventListener("keydown",(e)=>{
 if(e.shiftKey && e.key.toLowerCase()==="u"){
 const controls=document.getElementById("uploadControls");
-controls.style.display=
-controls.style.display==="none" ? "block" : "none";
+controls.style.display=controls.style.display==="none" ? "block" : "none";
 }
 });
 function createProjectItem(urls,mainIndex=0){
@@ -160,28 +159,15 @@ for(let i=0;i<files.length;i++){
 const file=files[i];
 const safeName=file.name.replace(/\s/g,"_");
 const fileName=`${Date.now()}_${safeName}`;
-const { error }=await supabase
-.storage
-.from('images')
-.upload(fileName,file);
+const { error }=await supabase.storage.from('images').upload(fileName,file);
 if(error){
 console.error(error);
 continue;
 }
-const { data }=supabase
-.storage
-.from('images')
-.getPublicUrl(fileName);
+const { data }=supabase.storage.from('images').getPublicUrl(fileName);
 uploadedUrls.push(data.publicUrl);
 }
-await supabase
-.from("projects")
-.insert([
-{
-images:uploadedUrls,
-main_index:mainIndex
-}
-]);
+await supabase.from("projects").insert([{images:uploadedUrls,main_index:mainIndex}]);
 createProjectItem(uploadedUrls,mainIndex);
 }
 document.getElementById("applyBtn").addEventListener("click",(e)=>{
@@ -189,10 +175,7 @@ e.preventDefault();
 applyImages();
 });
 window.addEventListener("DOMContentLoaded",async()=>{
-const { data,error }=await supabase
-.from("projects")
-.select("*")
-.order("created_at",{ascending:true});
+const { data,error }=await supabase.from("projects").select("*").order("created_at",{ascending:true});
 if(error){
 console.error(error);
 return;
