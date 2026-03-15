@@ -55,10 +55,7 @@ body{
 .extra-images img:nth-child(3){ transition-delay:0.25s; }
 .extra-images img:nth-child(4){ transition-delay:0.35s; }
 .extra-images img:nth-child(5){ transition-delay:0.45s; }
-.project-item:hover .extra-images img{
-    opacity:1;
-    transform:translateX(0);
-}
+.project-item:hover .extra-images img,
 .project-item.active .extra-images img{
     opacity:1;
     transform:translateX(0);
@@ -79,19 +76,15 @@ body{
     }
     .project-item{
         flex-direction:column;
+        gap:4px;
     }
     .main-image{
+        width:150px;
         height:150px;
-        width:auto;
         object-fit:cover;
     }
     .extra-images{
         flex-wrap:wrap;
-        gap:4px;
-    }
-    .extra-images img{
-        height:150px;
-        width:auto;
     }
     #floatingLogo{
         width:60px;
@@ -131,10 +124,10 @@ const mainImg=document.createElement("img");
 mainImg.classList.add("main-image");
 mainImg.src=mainUrl;
 mainImg.addEventListener("click", () => {
-    document.querySelectorAll('.project-item.active').forEach(item => {
-        if(item !== newItem) item.classList.remove('active');
-    });
-    newItem.classList.toggle("active");
+document.querySelectorAll('.project-item.active').forEach(item => {
+if(item!==newItem)item.classList.remove('active');
+});
+newItem.classList.toggle('active');
 });
 newItem.appendChild(mainImg);
 const extraDiv=document.createElement("div");
@@ -160,29 +153,18 @@ const file=files[i];
 const safeName=file.name.replace(/\s/g,"_");
 const fileName=`${Date.now()}_${safeName}`;
 const { error }=await supabase.storage.from('images').upload(fileName,file);
-if(error){
-console.error(error);
-continue;
-}
+if(error){console.error(error);continue;}
 const { data }=supabase.storage.from('images').getPublicUrl(fileName);
 uploadedUrls.push(data.publicUrl);
 }
 await supabase.from("projects").insert([{images:uploadedUrls,main_index:mainIndex}]);
 createProjectItem(uploadedUrls,mainIndex);
 }
-document.getElementById("applyBtn").addEventListener("click",(e)=>{
-e.preventDefault();
-applyImages();
-});
+document.getElementById("applyBtn").addEventListener("click",(e)=>{e.preventDefault();applyImages();});
 window.addEventListener("DOMContentLoaded",async()=>{
 const { data,error }=await supabase.from("projects").select("*").order("created_at",{ascending:true});
-if(error){
-console.error(error);
-return;
-}
-data.forEach(project=>{
-createProjectItem(project.images,project.main_index);
-});
+if(error){console.error(error);return;}
+data.forEach(project=>{createProjectItem(project.images,project.main_index);});
 });
 </script>
 <img src="logonew.png" id="floatingLogo">
