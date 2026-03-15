@@ -7,16 +7,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@100..900&display=swap" rel="stylesheet">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Coral+Pixels&family=Stardos+Stencil:wght@400;700&family=Urbanist:ital,wght@0,100..900;1,100..900&family=VT323&display=swap');
+
 body {
   display:flex;
   flex-direction:column;
   align-items:flex-start;
   font-family:'Stardos Stencil', Times, serif;
-  margin:40px auto;
-  max-width:900px;
-  padding-left: 0px;
+  margin:40px auto;  
+  max-width:900px;   
+  padding-left: 0; 
   box-sizing: border-box;
 }
+
 .project {
   display:flex;
   flex-direction:column;
@@ -26,53 +28,53 @@ body {
 }
 
 .logoRow{
-display:flex;
-gap:8px;
-margin-bottom:40px;
-align-items:flex-end;
-margin-left: -150px;
+  display:flex;
+  gap:8px;
+  margin-bottom:40px;
+  align-items:flex-end;
+  margin-left: -150px;
 }
 
 .logo{
-font-size:80px;
-color:maroon;
-line-height:1;
+  font-size:80px;
+  color:maroon;
+  line-height:1;
 }
 
 .logo2{
-font-size:60px;
-line-height:1;
-position:relative;
-top:-4px;
+  font-size:60px;
+  line-height:1;
+  position:relative;
+  top:-4px;
 }
 
 .project-item{
-position:relative;
-display:flex;
-flex-direction:row;
-gap:4px;
-margin-bottom:20px;
+  position:relative;
+  display:flex;
+  flex-direction:row;
+  gap:4px;
+  margin-bottom:20px;
 }
 
 .main-image{
-width:200px;
-height:200px;
-object-fit:cover;
-cursor:pointer;
+  width:200px;
+  height:200px;
+  object-fit:cover;
+  cursor:pointer;
 }
 
 .extra-images{
-display:flex;
-gap:4px;
+  display:flex;
+  gap:4px;
 }
 
 .extra-images img{
-height:200px;
-width:auto;
-object-fit:cover;
-opacity:0;
-transform:translateX(-20px);
-transition:opacity 0.4s ease, transform 0.4s ease;
+  height:200px;
+  width:auto;
+  object-fit:cover;
+  opacity:0;
+  transform:translateX(-20px);
+  transition:opacity 0.4s ease, transform 0.4s ease;
 }
 
 .extra-images img:nth-child(1){transition-delay:0.05s;}
@@ -81,70 +83,83 @@ transition:opacity 0.4s ease, transform 0.4s ease;
 .extra-images img:nth-child(4){transition-delay:0.35s;}
 .extra-images img:nth-child(5){transition-delay:0.45s;}
 
-.project-item:hover .extra-images img{
-opacity:1;
-transform:translateX(0);
-}
-
+.project-item:hover .extra-images img,
 .project-item.active .extra-images img{
-opacity:1;
-transform:translateX(0);
+  opacity:1;
+  transform:translateX(0);
 }
 
 #floatingLogo{
-position:fixed;
-bottom:20px;
-left:20px;
-width:100px;
-height:auto;
-z-index:1000;
-opacity:0.2;
+  position:fixed;
+  bottom:20px;
+  left:20px;
+  width:100px;
+  height:auto;
+  z-index:1000;
+  opacity:0.8; /* more visible */
 }
 
 @media (max-width:700px){
+  body{
+    margin:15px;
+    align-items:flex-start;
+  }
 
-body{
-margin:15px;
-align-items:flex-start;
-}
+  .project{
+    width: 100%;
+    margin-left:0;
+    padding-left:0;
+  }
 
-.project-item{
-flex-direction:column;
-}
+  .logoRow{
+    margin-left:0;
+    justify-content:flex-start;
+    gap:8px;
+  }
 
-.main-image{
-width:100%;
-aspect-ratio:1/1;
-height:auto;
-object-fit:cover;
-}
+  .logo{
+    font-size:50px;
+  }
 
-.extra-images{
-display:flex;
-flex-wrap:wrap;
-gap:4px;
-}
+  .logo2{
+    font-size:40px;
+  }
 
-.extra-images img{
-height:150px;
-width:auto;
-object-fit:cover;
-opacity:0;
-transform:translateY(-10px);
-transition:opacity 0.4s ease, transform 0.4s ease;
-}
+  .project-item{
+    flex-direction:column;
+  }
 
-.project-item.active .extra-images img{
-opacity:1;
-transform:translateY(0);
-}
+  .main-image{
+    width:100%;
+    aspect-ratio:1/1;
+    height:auto;
+  }
 
-#floatingLogo{
-width:60px;
-left:10px;
-bottom:10px;
-}
+  .extra-images{
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px;
+  }
 
+  .extra-images img{
+    height:150px;
+    width:auto;
+    object-fit:cover;
+    opacity:0;
+    transform:translateY(-10px);
+    transition:opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  .project-item.active .extra-images img{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+  #floatingLogo{
+    width:60px;
+    left:10px;
+    bottom:10px;
+  }
 }
 </style>
 </head>
@@ -152,16 +167,16 @@ bottom:10px;
 <body>
 
 <div class="logoRow">
-<div class="logo">A&I</div>
-<div class="logo2">Design</div>
+  <div class="logo">A&I</div>
+  <div class="logo2">Design</div>
 </div>
 
 <div id="uploadControls" style="display:none;">
-<input type="file" id="imageUpload" multiple accept="image/*">
-<br><br>
-<label>Main Image (1 = first):</label>
-<input type="number" id="mainIndex" min="1" max="5" value="1">
-<button id="applyBtn">Upload & Display</button>
+  <input type="file" id="imageUpload" multiple accept="image/*">
+  <br><br>
+  <label>Main Image (1 = first):</label>
+  <input type="number" id="mainIndex" min="1" max="5" value="1">
+  <button id="applyBtn">Upload & Display</button>
 </div>
 
 <div class="project" id="projectContainer"></div>
@@ -175,116 +190,99 @@ const supabaseKey="sb_publishable_v6_XC8fxKYba0GJo8otcKQ_dN9mSpnS";
 const supabase=createClient(supabaseUrl,supabaseKey);
 
 document.addEventListener("keydown",(e)=>{
-if(e.shiftKey && e.key.toLowerCase()==="u"){
-const controls=document.getElementById("uploadControls");
-controls.style.display= controls.style.display==="none" ? "block" : "none";
-}
+  if(e.shiftKey && e.key.toLowerCase()==="u"){
+    const controls=document.getElementById("uploadControls");
+    controls.style.display= controls.style.display==="none" ? "block" : "none";
+  }
 });
 
 function createProjectItem(urls,mainIndex=0){
+  const projectContainer=document.getElementById("projectContainer");
+  const newItem=document.createElement("div");
+  newItem.classList.add("project-item");
 
-const projectContainer=document.getElementById("projectContainer");
-const newItem=document.createElement("div");
-newItem.classList.add("project-item");
+  const mainUrl=urls[mainIndex]||urls[0];
 
-const mainUrl=urls[mainIndex]||urls[0];
+  const mainImg=document.createElement("img");
+  mainImg.classList.add("main-image");
+  mainImg.src=mainUrl;
 
-const mainImg=document.createElement("img");
-mainImg.classList.add("main-image");
-mainImg.src=mainUrl;
+  mainImg.addEventListener("click",()=>{
+    if(window.innerWidth>700) return;
+    document.querySelectorAll('.project-item.active').forEach(item=>{
+      if(item!==newItem) item.classList.remove('active');
+    });
+    newItem.classList.toggle("active");
+  });
 
-mainImg.addEventListener("click",()=>{
+  newItem.appendChild(mainImg);
 
-if(window.innerWidth>700) return;
+  const extraDiv=document.createElement("div");
+  extraDiv.classList.add("extra-images");
 
-document.querySelectorAll('.project-item.active').forEach(item=>{
-if(item!==newItem) item.classList.remove('active');
-});
+  urls.forEach((url,i)=>{
+    if(i!==mainIndex){
+      const img=document.createElement("img");
+      img.src=url;
+      extraDiv.appendChild(img);
+    }
+  });
 
-newItem.classList.toggle("active");
+  newItem.appendChild(extraDiv);
 
-});
-
-newItem.appendChild(mainImg);
-
-const extraDiv=document.createElement("div");
-extraDiv.classList.add("extra-images");
-
-urls.forEach((url,i)=>{
-if(i!==mainIndex){
-const img=document.createElement("img");
-img.src=url;
-extraDiv.appendChild(img);
-}
-});
-
-newItem.appendChild(extraDiv);
-
-projectContainer.appendChild(newItem);
-
+  // Append for consistent newest-first order
+  projectContainer.appendChild(newItem);
 }
 
 async function applyImages(){
+  const files=document.getElementById("imageUpload").files;
+  let mainIndex=parseInt(document.getElementById("mainIndex").value)-1;
+  mainIndex=Math.max(0,Math.min(mainIndex,files.length-1));
+  if(files.length===0) return;
 
-const files=document.getElementById("imageUpload").files;
-let mainIndex=parseInt(document.getElementById("mainIndex").value)-1;
-mainIndex=Math.max(0,Math.min(mainIndex,files.length-1));
+  let uploadedUrls=[];
 
-if(files.length===0)return;
+  for(let i=0;i<files.length;i++){
+    const file=files[i];
+    const safeName=file.name.replace(/\s/g,"_");
+    const fileName=`${Date.now()}_${safeName}`;
 
-let uploadedUrls=[];
+    const { error }=await supabase.storage.from('images').upload(fileName,file);
+    if(error){
+      console.error(error);
+      continue;
+    }
 
-for(let i=0;i<files.length;i++){
+    const { data }=supabase.storage.from('images').getPublicUrl(fileName);
+    uploadedUrls.push(data.publicUrl);
+  }
 
-const file=files[i];
-const safeName=file.name.replace(/\s/g,"_");
-const fileName=`${Date.now()}_${safeName}`;
+  await supabase.from("projects").insert([
+    { images:uploadedUrls, main_index:mainIndex }
+  ]);
 
-const { error }=await supabase.storage.from('images').upload(fileName,file);
-
-if(error){
-console.error(error);
-continue;
-}
-
-const { data }=supabase.storage.from('images').getPublicUrl(fileName);
-
-uploadedUrls.push(data.publicUrl);
-
-}
-
-await supabase.from("projects").insert([
-{
-images:uploadedUrls,
-main_index:mainIndex
-}
-]);
-
-createProjectItem(uploadedUrls,mainIndex);
-
+  createProjectItem(uploadedUrls,mainIndex);
 }
 
 document.getElementById("applyBtn").addEventListener("click",(e)=>{
-e.preventDefault();
-applyImages();
+  e.preventDefault();
+  applyImages();
 });
 
 window.addEventListener("DOMContentLoaded",async()=>{
+  const { data,error }=await supabase
+    .from("projects")
+    .select("*")
+    .order("created_at",{ascending:false}); // newest first
 
-const { data,error }=await supabase
-.from("projects")
-.select("*")
-.order("created_at",{ascending:false});
+  if(error){
+    console.error(error);
+    return;
+  }
 
-if(error){
-console.error(error);
-return;
-}
-
-data.forEach(project=>{
-createProjectItem(project.images,project.main_index);
-});
-
+  data.forEach(project=>{
+    createProjectItem(project.images,project.main_index);
+  });
 });
 
 </script>
