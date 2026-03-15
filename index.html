@@ -45,27 +45,23 @@ body{
     display:flex;
     gap:4px;
     flex-wrap:wrap;
+    transform-origin: top left;
 }
 .extra-images img{
     height:200px;
     width:auto;
     object-fit:cover;
     opacity:0;
-    transform:translateY(-10px);
+    transform:scale(0.5);
     transition:opacity 0.4s ease, transform 0.4s ease;
 }
-.extra-images img:nth-child(1){ transition-delay:0.05s; }
-.extra-images img:nth-child(2){ transition-delay:0.15s; }
-.extra-images img:nth-child(3){ transition-delay:0.25s; }
-.extra-images img:nth-child(4){ transition-delay:0.35s; }
-.extra-images img:nth-child(5){ transition-delay:0.45s; }
 .project-item:hover .extra-images img{
     opacity:1;
-    transform:translateY(0);
+    transform:scale(1);
 }
 .project-item.active .extra-images img{
     opacity:1;
-    transform:translateY(0);
+    transform:scale(1);
 }
 #floatingLogo{
     position:fixed;
@@ -77,7 +73,6 @@ body{
     opacity:0.1;
 }
 
-/* MOBILE STYLES */
 @media (max-width:700px){
     body{
         margin:15px;
@@ -89,7 +84,7 @@ body{
     .main-image{
         width:100%;
         height:0;
-        padding-top:100%; /* square */
+        padding-top:100%;
         position:relative;
     }
     .main-image-container{
@@ -106,9 +101,8 @@ body{
         object-fit:cover;
     }
     .extra-images img{
-        flex:1 1 calc(50% - 4px);
-        max-width:calc(50% - 4px);
-        height:auto;
+        height:150px; /* same height */
+        width:auto;   /* natural width */
     }
     #floatingLogo{
         width:60px;
@@ -134,7 +128,6 @@ body{
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-
 const supabaseUrl="https://akxfknwujratwjolwwar.supabase.co";
 const supabaseKey="sb_publishable_v6_XC8fxKYba0GJo8otcKQ_dN9mSpnS";
 const supabase=createClient(supabaseUrl,supabaseKey);
@@ -153,28 +146,37 @@ function createProjectItem(urls,mainIndex=0){
 
     const isMobile = window.innerWidth <= 700;
 
-    const mainUrl=urls[mainIndex]||urls[0];
+    const mainUrl = urls[mainIndex]||urls[0];
     let mainImg;
+
     if(isMobile){
         const mainContainer=document.createElement("div");
         mainContainer.classList.add("main-image-container");
         mainImg=document.createElement("img");
-        mainImg.src=mainUrl;
-        mainImg.addEventListener("click", () => {
-            // toggle only on mobile
-            newItem.classList.toggle("active");
+        mainImg.src = mainUrl;
+
+        mainImg.addEventListener("click", ()=>{
+            const currentlyActive = newItem.classList.contains("active");
+            // hide all other active extra images first
+            document.querySelectorAll('.project-item.active').forEach(item => {
+                if(item !== newItem) item.classList.remove("active");
+            });
+            if(!currentlyActive) newItem.classList.add("active");
+            else newItem.classList.remove("active");
         });
+
         mainContainer.appendChild(mainImg);
         newItem.appendChild(mainContainer);
     } else {
         mainImg=document.createElement("img");
         mainImg.classList.add("main-image");
-        mainImg.src=mainUrl;
+        mainImg.src = mainUrl;
         newItem.appendChild(mainImg);
     }
 
-    const extraDiv=document.createElement("div");
+    const extraDiv = document.createElement("div");
     extraDiv.classList.add("extra-images");
+
     urls.forEach((url,i)=>{
         if(i!==mainIndex){
             const img=document.createElement("img");
@@ -182,6 +184,7 @@ function createProjectItem(urls,mainIndex=0){
             extraDiv.appendChild(img);
         }
     });
+
     newItem.appendChild(extraDiv);
     projectContainer.appendChild(newItem);
 }
@@ -190,7 +193,7 @@ async function applyImages(){
     const files=document.getElementById("imageUpload").files;
     let mainIndex=parseInt(document.getElementById("mainIndex").value)-1;
     mainIndex=Math.max(0,Math.min(mainIndex,files.length-1));
-    if(files.length===0)return;
+    if(files.length===0) return;
 
     let uploadedUrls=[];
     for(let i=0;i<files.length;i++){
@@ -203,8 +206,8 @@ async function applyImages(){
         uploadedUrls.push(data.publicUrl);
     }
 
-    await supabase.from("projects").insert([{images:uploadedUrls,main_index:mainIndex}]);
-    createProjectItem(uploadedUrls,mainIndex);
+    await supabase.from("projects").insert([{images:uploadedUrls, main_index:mainIndex}]);
+    createProjectItem(uploadedUrls, mainIndex);
 }
 
 document.getElementById("applyBtn").addEventListener("click",(e)=>{
@@ -220,6 +223,5 @@ window.addEventListener("DOMContentLoaded", async ()=>{
 </script>
 
 <img src="images/logo.png" id="floatingLogo">
-
 </body>
 </html>
