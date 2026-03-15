@@ -180,8 +180,13 @@ mainImg.src=mainUrl;
 
 /* click toggle animation */
 
-mainImg.addEventListener("click",()=>{
-newItem.classList.toggle("active");
+mainImg.addEventListener("click", () => {
+    // Close all other rows
+    document.querySelectorAll('.project-item.active').forEach(item => {
+        if(item !== newItem) item.classList.remove('active');
+    });
+    // Toggle this row
+    newItem.classList.toggle("active");
 });
 
 newItem.appendChild(mainImg);
