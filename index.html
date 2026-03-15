@@ -112,9 +112,13 @@ body{
     flex-wrap:wrap;
 }
 
-.extra-images img{
-    width:32%;
-    height:auto;
+.extra-images img {
+    width: auto; 
+    height:200px;          
+    object-fit: cover;     
+    opacity:0;             
+    transform: translateX(-20px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
 #floatingLogo{
