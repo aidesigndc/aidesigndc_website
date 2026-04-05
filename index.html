@@ -126,9 +126,9 @@ width:100%;
 .main-image{
 width:100%;
 aspect-ratio:1/1;
-background-size:cover;
-background-position:left center;
-background-repeat:no-repeat;
+height:100%;
+object-fit:cover;
+object-position:left center;
 display:block;
 }
 .extra-images{
@@ -196,12 +196,10 @@ function createProjectItem(urls,mainIndex=0){
 const projectContainer=document.getElementById("projectContainer");
 const newItem=document.createElement("div");
 newItem.classList.add("project-item");
-
 const mainUrl=urls[mainIndex]||urls[0];
-
-const mainImg=document.createElement("div");
+const mainImg=document.createElement("img");
 mainImg.classList.add("main-image");
-mainImg.style.backgroundImage=`url(${mainUrl})`;
+mainImg.src=mainUrl;
 
 mainImg.addEventListener("click",()=>{
 if(window.innerWidth>700) return;
