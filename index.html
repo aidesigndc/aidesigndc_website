@@ -145,8 +145,9 @@ body{
 
   .main-image{
     width:100%;
-    height:auto;
+    aspect-ratio:1/1;
     object-fit:cover;
+    display:block;
   }
 
   .extra-images{
@@ -203,7 +204,6 @@ body{
 <div class="project" id="projectContainer"></div>
 
 <script type="module">
-
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
 const supabaseUrl="https://akxfknwujratwjolwwar.supabase.co";
@@ -218,7 +218,6 @@ controls.style.display= controls.style.display==="none" ? "block" : "none";
 });
 
 function createProjectItem(urls,mainIndex=0){
-
 const projectContainer=document.getElementById("projectContainer");
 const newItem=document.createElement("div");
 newItem.classList.add("project-item");
@@ -315,7 +314,6 @@ createProjectItem(project.images,project.main_index);
 });
 
 });
-
 </script>
 
 <img src="logonew.png" id="floatingLogo">
