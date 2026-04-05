@@ -10,22 +10,23 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Coral+Pixels&family=Stardos+Stencil:wght@400;700&family=Urbanist:ital,wght@0,100..900;1,100..900&family=VT323&display=swap');
 
-body {
+body{
   display:flex;
   flex-direction:column;
   align-items:flex-start;
   font-family:'Stardos Stencil', Times, serif;
   margin:40px auto;
   max-width:900px;
-  padding:0 20px;
+  padding-left:0;
   box-sizing:border-box;
 }
 
-.project {
+.project{
   display:flex;
   flex-direction:column;
   gap:5px;
   width:100%;
+  margin-left:-300px;
 }
 
 .logoRow{
@@ -33,6 +34,7 @@ body {
   gap:8px;
   margin-bottom:40px;
   align-items:flex-end;
+  margin-left:-375px;
 }
 
 .logo{
@@ -128,6 +130,14 @@ body {
     align-items:flex-start;
   }
 
+  .project{
+    margin-left:0;
+  }
+
+  .logoRow{
+    margin-left:0;
+  }
+
   .project-item{
     flex-direction:column;
     align-items:flex-start;
@@ -135,8 +145,8 @@ body {
 
   .main-image{
     width:100%;
-    aspect-ratio:1/1;
     height:auto;
+    object-fit:cover;
   }
 
   .extra-images{
@@ -147,11 +157,12 @@ body {
   .extra-images img{
     height:150px;
     width:auto;
+    object-fit:cover;
     opacity:0;
     transform:translateY(-10px);
     transition:opacity 0.4s ease, transform 0.4s ease;
-    display:block;
     margin-right:auto;
+    display:block;
   }
 
   .project-item.active .extra-images img{
