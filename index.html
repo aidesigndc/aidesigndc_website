@@ -144,11 +144,11 @@ body{
   }
 
   .main-image{
-    width:100%;
+    width:auto;
     height:200px;
+    max-width:100%;
     object-fit:cover;
-    object-position:left;
-    display:block;
+    align-self:flex-start;
   }
 
   .extra-images{
@@ -160,11 +160,10 @@ body{
     height:150px;
     width:auto;
     object-fit:cover;
-    object-position:left;
     opacity:0;
     transform:translateY(-10px);
     transition:opacity 0.4s ease, transform 0.4s ease;
-    display:block;
+    align-self:flex-start;
   }
 
   .project-item.active .extra-images img{
