@@ -10,11 +10,11 @@
 body {
   display:flex;
   flex-direction:column;
-  align-items:center;
+  align-items:flex-start;
   font-family:'Stardos Stencil', Times, serif;
   margin:40px auto;
   max-width:900px;
-  padding:0 16px;
+  padding-left:0px;
   box-sizing:border-box;
 }
 .project {
@@ -22,15 +22,14 @@ body {
   flex-direction:column;
   gap:5px;
   width:100%;
-  margin-left:0;
+  margin-left:-300px;
 }
 .logoRow{
   display:flex;
   gap:8px;
   margin-bottom:40px;
   align-items:flex-end;
-  margin-left:0;
-  justify-content:center;
+  margin-left:-375px;
 }
 .logo{
 font-size:80px;
@@ -94,8 +93,7 @@ transform:translateX(0);
   font-size:30px;
   margin-top:6px;
   letter-spacing:1.5px;
-  color: black;
-  text-align:center;
+  color:black;
 }
 #floatingLogo{
 position:fixed;
@@ -110,6 +108,14 @@ opacity:0.8;
 body{
 margin:15px;
 align-items:center;
+padding:0 16px;
+}
+.project{
+margin-left:0;
+}
+.logoRow{
+margin-left:0;
+justify-content:center;
 }
 .project-item{
 flex-direction:column;
@@ -146,6 +152,7 @@ bottom:10px;
 </style>
 </head>
 <body>
+
 <div class="logoRow">
   <div class="logoBlock">
     <div class="logoLine">
@@ -155,6 +162,7 @@ bottom:10px;
     <div class="tagline">= comfortable life + vibrant community + lush nature...</div>
   </div>
 </div>
+
 <div id="uploadControls" style="display:none;">
 <input type="file" id="imageUpload" multiple accept="image/*">
 <br><br>
@@ -162,18 +170,22 @@ bottom:10px;
 <input type="number" id="mainIndex" min="1" max="5" value="1">
 <button id="applyBtn">Upload & Display</button>
 </div>
+
 <div class="project" id="projectContainer"></div>
+
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 const supabaseUrl="https://akxfknwujratwjolwwar.supabase.co";
 const supabaseKey="sb_publishable_v6_XC8fxKYba0GJo8otcKQ_dN9mSpnS";
 const supabase=createClient(supabaseUrl,supabaseKey);
+
 document.addEventListener("keydown",(e)=>{
 if(e.shiftKey && e.key.toLowerCase()==="u"){
 const controls=document.getElementById("uploadControls");
 controls.style.display= controls.style.display==="none" ? "block" : "none";
 }
 });
+
 function createProjectItem(urls,mainIndex=0){
 const projectContainer=document.getElementById("projectContainer");
 const newItem=document.createElement("div");
@@ -182,6 +194,7 @@ const mainUrl=urls[mainIndex]||urls[0];
 const mainImg=document.createElement("img");
 mainImg.classList.add("main-image");
 mainImg.src=mainUrl;
+
 mainImg.addEventListener("click",()=>{
 if(window.innerWidth>700) return;
 document.querySelectorAll('.project-item.active').forEach(item=>{
@@ -189,9 +202,12 @@ if(item!==newItem) item.classList.remove('active');
 });
 newItem.classList.toggle("active");
 });
+
 newItem.appendChild(mainImg);
+
 const extraDiv=document.createElement("div");
 extraDiv.classList.add("extra-images");
+
 urls.forEach((url,i)=>{
 if(i!==mainIndex){
 const img=document.createElement("img");
@@ -199,53 +215,68 @@ img.src=url;
 extraDiv.appendChild(img);
 }
 });
+
 newItem.appendChild(extraDiv);
 projectContainer.appendChild(newItem);
 }
+
 async function applyImages(){
 const files=document.getElementById("imageUpload").files;
 let mainIndex=parseInt(document.getElementById("mainIndex").value)-1;
 mainIndex=Math.max(0,Math.min(mainIndex,files.length-1));
 if(files.length===0)return;
+
 let uploadedUrls=[];
+
 for(let i=0;i<files.length;i++){
 const file=files[i];
 const safeName=file.name.replace(/\s/g,"_");
 const fileName=`${Date.now()}_${safeName}`;
+
 const { error }=await supabase.storage.from('images').upload(fileName,file);
+
 if(error){
 console.error(error);
 continue;
 }
+
 const { data }=supabase.storage.from('images').getPublicUrl(fileName);
 uploadedUrls.push(data.publicUrl);
 }
+
 await supabase.from("projects").insert([
 {
 images:uploadedUrls,
 main_index:mainIndex
 }
 ]);
+
 createProjectItem(uploadedUrls,mainIndex);
 }
+
 document.getElementById("applyBtn").addEventListener("click",(e)=>{
 e.preventDefault();
 applyImages();
 });
+
 window.addEventListener("DOMContentLoaded",async()=>{
 const { data,error }=await supabase
 .from("projects")
 .select("*")
 .order("created_at",{ascending:false});
+
 if(error){
 console.error(error);
 return;
 }
+
 data.forEach(project=>{
 createProjectItem(project.images,project.main_index);
 });
 });
 </script>
+
 <img src="logonew.png" id="floatingLogo">
+
 </body>
 </html>
