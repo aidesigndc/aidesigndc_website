@@ -10,23 +10,22 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Coral+Pixels&family=Stardos+Stencil:wght@400;700&family=Urbanist:ital,wght@0,100..900;1,100..900&family=VT323&display=swap');
 
-body{
+body {
   display:flex;
   flex-direction:column;
   align-items:flex-start;
   font-family:'Stardos Stencil', Times, serif;
   margin:40px auto;
   max-width:900px;
-  padding-left:0;
+  padding:0 20px;
   box-sizing:border-box;
 }
 
-.project{
+.project {
   display:flex;
   flex-direction:column;
   gap:5px;
   width:100%;
-  margin-left:-300px;
 }
 
 .logoRow{
@@ -34,7 +33,6 @@ body{
   gap:8px;
   margin-bottom:40px;
   align-items:flex-end;
-  margin-left:-375px;
 }
 
 .logo{
@@ -127,14 +125,7 @@ body{
 
   body{
     margin:15px;
-  }
-
-  .project{
-    margin-left:0;
-  }
-
-  .logoRow{
-    margin-left:0;
+    align-items:flex-start;
   }
 
   .project-item{
@@ -144,10 +135,8 @@ body{
 
   .main-image{
     width:100%;
-    height:280px;
-    object-fit:cover;
-    object-position:left center;
-    display:block;
+    aspect-ratio:1/1;
+    height:auto;
   }
 
   .extra-images{
@@ -158,12 +147,11 @@ body{
   .extra-images img{
     height:150px;
     width:auto;
-    object-fit:cover;
-    object-position:left center;
     opacity:0;
     transform:translateY(-10px);
     transition:opacity 0.4s ease, transform 0.4s ease;
     display:block;
+    margin-right:auto;
   }
 
   .project-item.active .extra-images img{
@@ -204,6 +192,7 @@ body{
 <div class="project" id="projectContainer"></div>
 
 <script type="module">
+
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
 const supabaseUrl="https://akxfknwujratwjolwwar.supabase.co";
@@ -218,6 +207,7 @@ controls.style.display= controls.style.display==="none" ? "block" : "none";
 });
 
 function createProjectItem(urls,mainIndex=0){
+
 const projectContainer=document.getElementById("projectContainer");
 const newItem=document.createElement("div");
 newItem.classList.add("project-item");
@@ -230,9 +220,11 @@ mainImg.src=mainUrl;
 
 mainImg.addEventListener("click",()=>{
 if(window.innerWidth>700) return;
+
 document.querySelectorAll('.project-item.active').forEach(item=>{
 if(item!==newItem) item.classList.remove('active');
 });
+
 newItem.classList.toggle("active");
 });
 
@@ -254,24 +246,39 @@ projectContainer.appendChild(newItem);
 }
 
 async function applyImages(){
+
 const files=document.getElementById("imageUpload").files;
 let mainIndex=parseInt(document.getElementById("mainIndex").value)-1;
 mainIndex=Math.max(0,Math.min(mainIndex,files.length-1));
+
 if(files.length===0)return;
 
 let uploadedUrls=[];
 
 for(let i=0;i<files.length;i++){
+
 const file=files[i];
 const safeName=file.name.replace(/\s/g,"_");
 const fileName=`${Date.now()}_${safeName}`;
+
 const { error }=await supabase.storage.from('images').upload(fileName,file);
-if(error){ console.error(error); continue; }
+
+if(error){
+console.error(error);
+continue;
+}
+
 const { data }=supabase.storage.from('images').getPublicUrl(fileName);
 uploadedUrls.push(data.publicUrl);
 }
 
-await supabase.from("projects").insert([{ images:uploadedUrls, main_index:mainIndex }]);
+await supabase.from("projects").insert([
+{
+images:uploadedUrls,
+main_index:mainIndex
+}
+]);
+
 createProjectItem(uploadedUrls,mainIndex);
 }
 
@@ -281,15 +288,23 @@ applyImages();
 });
 
 window.addEventListener("DOMContentLoaded",async()=>{
+
 const { data,error }=await supabase
 .from("projects")
 .select("*")
 .order("created_at",{ascending:false});
-if(error){ console.error(error); return; }
+
+if(error){
+console.error(error);
+return;
+}
+
 data.forEach(project=>{
 createProjectItem(project.images,project.main_index);
 });
+
 });
+
 </script>
 
 <img src="logonew.png" id="floatingLogo">
