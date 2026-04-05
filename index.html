@@ -128,7 +128,7 @@ body{
 
 .project,
 .logoRow{
-  margin-left:0;
+  margin-left:0 !important;
 }
 
 .project-item{
@@ -137,9 +137,9 @@ body{
 }
 
 .main-image{
-  width:100%;
+  width:auto;
+  max-width:100%;
   height:auto;
-  object-fit:contain; /* or cover if you prefer */
   display:block;
   margin:0;
 }
@@ -162,12 +162,6 @@ body{
 .project-item.active .extra-images img{
   opacity:1;
   transform:translateY(0);
-}
-
-#floatingLogo{
-  width:60px;
-  left:10px;
-  bottom:10px;
 }
 
 }
