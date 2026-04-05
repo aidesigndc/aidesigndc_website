@@ -1,5 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A&I Design</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@100..900&display=swap" rel="stylesheet">
+
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Coral+Pixels&family=Stardos+Stencil:wght@400;700&family=Urbanist:ital,wght@0,100..900;1,100..900&family=VT323&display=swap');
+
+body{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  font-family:'Stardos Stencil', Times, serif;
+  margin:40px auto;
+  max-width:900px;
+  padding-left:0;
+  box-sizing:border-box;
+}
+
+.project{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  width:100%;
+  margin-left:-300px;
+}
+
+.logoRow{
+  display:flex;
+  gap:8px;
+  margin-bottom:40px;
+  align-items:flex-end;
+  margin-left:-375px;
+}
+
+.logo{
+  font-size:80px;
+  color:maroon;
+  line-height:1;
+}
+
+.logo2{
+  font-size:60px;
+  line-height:1;
+  position:relative;
+  top:-4px;
+}
+
+.project-item{
+  position:relative;
+  display:flex;
+  flex-direction:row;
+  gap:4px;
+  margin-bottom:20px;
+}
+
+.main-image{
+  width:200px;
+  height:200px;
+  object-fit:cover;
+  cursor:pointer;
+}
+
+.extra-images{
+  display:flex;
+  gap:4px;
+}
+
+.extra-images img{
+  height:200px;
+  width:auto;
+  object-fit:cover;
+  opacity:0;
+  transform:translateX(-20px);
+  transition:opacity 0.4s ease, transform 0.4s ease;
+}
+
+.extra-images img:nth-child(1){transition-delay:0.05s;}
+.extra-images img:nth-child(2){transition-delay:0.15s;}
+.extra-images img:nth-child(3){transition-delay:0.25s;}
+.extra-images img:nth-child(4){transition-delay:0.35s;}
+.extra-images img:nth-child(5){transition-delay:0.45s;}
+
+.project-item:hover .extra-images img{
+  opacity:1;
+  transform:translateX(0);
+}
+
+.project-item.active .extra-images img{
+  opacity:1;
+  transform:translateX(0);
+}
+
+.logoBlock{
+  display:flex;
+  flex-direction:column;
+}
+
+.logoLine{
+  display:flex;
+  gap:8px;
+  align-items:flex-end;
+}
+
+.tagline{
+  font-size:30px;
+  margin-top:6px;
+  letter-spacing:1.5px;
+  color:black;
+}
+
+#floatingLogo{
+  position:fixed;
+  bottom:20px;
+  left:20px;
+  width:100px;
+  height:auto;
+  z-index:1000;
+  opacity:0.4;
+}
+
 @media (max-width:700px){
+
+  body{
+    margin:15px;
+    align-items:flex-start;
+  }
 
   .project{
     margin-left:0;
@@ -31,9 +160,141 @@
   .extra-images img{
     height:150px;
     width:auto;
+    object-fit:cover;
     display:block;
     margin-left:0;
+    opacity:0;
+    transform:translateY(-10px);
+    transition:opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  .project-item.active .extra-images img{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+  #floatingLogo{
+    width:60px;
+    left:10px;
+    bottom:10px;
   }
 
 }
 </style>
+</head>
+
+<body>
+
+<div class="logoRow">
+  <div class="logoBlock">
+    <div class="logoLine">
+      <div class="logo">A&I</div>
+      <div class="logo2">Design</div>
+    </div>
+    <div class="tagline">= comfortable life + vibrant community + lush nature...</div>
+  </div>
+</div>
+
+<div id="uploadControls" style="display:none;">
+<input type="file" id="imageUpload" multiple accept="image/*">
+<br><br>
+<label>Main Image (1 = first):</label>
+<input type="number" id="mainIndex" min="1" max="5" value="1">
+<button id="applyBtn">Upload & Display</button>
+</div>
+
+<div class="project" id="projectContainer"></div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const supabaseUrl="https://akxfknwujratwjolwwar.supabase.co";
+const supabaseKey="sb_publishable_v6_XC8fxKYba0GJo8otcKQ_dN9mSpnS";
+const supabase=createClient(supabaseUrl,supabaseKey);
+
+document.addEventListener("keydown",(e)=>{
+if(e.shiftKey && e.key.toLowerCase()==="u"){
+const controls=document.getElementById("uploadControls");
+controls.style.display= controls.style.display==="none" ? "block" : "none";
+}
+});
+
+function createProjectItem(urls,mainIndex=0){
+const projectContainer=document.getElementById("projectContainer");
+const newItem=document.createElement("div");
+newItem.classList.add("project-item");
+
+const mainUrl=urls[mainIndex]||urls[0];
+
+const mainImg=document.createElement("img");
+mainImg.classList.add("main-image");
+mainImg.src=mainUrl;
+
+mainImg.addEventListener("click",()=>{
+if(window.innerWidth>700) return;
+document.querySelectorAll('.project-item.active').forEach(item=>{
+if(item!==newItem) item.classList.remove('active');
+});
+newItem.classList.toggle("active");
+});
+
+newItem.appendChild(mainImg);
+
+const extraDiv=document.createElement("div");
+extraDiv.classList.add("extra-images");
+
+urls.forEach((url,i)=>{
+if(i!==mainIndex){
+const img=document.createElement("img");
+img.src=url;
+extraDiv.appendChild(img);
+}
+});
+
+newItem.appendChild(extraDiv);
+projectContainer.appendChild(newItem);
+}
+
+async function applyImages(){
+const files=document.getElementById("imageUpload").files;
+let mainIndex=parseInt(document.getElementById("mainIndex").value)-1;
+mainIndex=Math.max(0,Math.min(mainIndex,files.length-1));
+if(files.length===0)return;
+
+let uploadedUrls=[];
+
+for(let i=0;i<files.length;i++){
+const file=files[i];
+const safeName=file.name.replace(/\s/g,"_");
+const fileName=`${Date.now()}_${safeName}`;
+const { error }=await supabase.storage.from('images').upload(fileName,file);
+if(error){ console.error(error); continue; }
+const { data }=supabase.storage.from('images').getPublicUrl(fileName);
+uploadedUrls.push(data.publicUrl);
+}
+
+await supabase.from("projects").insert([{ images:uploadedUrls, main_index:mainIndex }]);
+createProjectItem(uploadedUrls,mainIndex);
+}
+
+document.getElementById("applyBtn").addEventListener("click",(e)=>{
+e.preventDefault();
+applyImages();
+});
+
+window.addEventListener("DOMContentLoaded",async()=>{
+const { data,error }=await supabase
+.from("projects")
+.select("*")
+.order("created_at",{ascending:false});
+if(error){ console.error(error); return; }
+data.forEach(project=>{
+createProjectItem(project.images,project.main_index);
+});
+});
+</script>
+
+<img src="logonew.png" id="floatingLogo">
+
+</body>
+</html>
