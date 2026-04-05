@@ -145,10 +145,9 @@ body{
 
   .main-image{
     width:auto;
-    height:200px;
     max-width:100%;
-    object-fit:cover;
-    align-self:flex-start;
+    height:auto;
+    display:block;
   }
 
   .extra-images{
@@ -163,7 +162,7 @@ body{
     opacity:0;
     transform:translateY(-10px);
     transition:opacity 0.4s ease, transform 0.4s ease;
-    align-self:flex-start;
+    display:block;
   }
 
   .project-item.active .extra-images img{
@@ -204,7 +203,6 @@ body{
 <div class="project" id="projectContainer"></div>
 
 <script type="module">
-
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
 const supabaseUrl="https://akxfknwujratwjolwwar.supabase.co";
@@ -219,7 +217,6 @@ controls.style.display= controls.style.display==="none" ? "block" : "none";
 });
 
 function createProjectItem(urls,mainIndex=0){
-
 const projectContainer=document.getElementById("projectContainer");
 const newItem=document.createElement("div");
 newItem.classList.add("project-item");
@@ -232,11 +229,9 @@ mainImg.src=mainUrl;
 
 mainImg.addEventListener("click",()=>{
 if(window.innerWidth>700) return;
-
 document.querySelectorAll('.project-item.active').forEach(item=>{
 if(item!==newItem) item.classList.remove('active');
 });
-
 newItem.classList.toggle("active");
 });
 
@@ -258,39 +253,24 @@ projectContainer.appendChild(newItem);
 }
 
 async function applyImages(){
-
 const files=document.getElementById("imageUpload").files;
 let mainIndex=parseInt(document.getElementById("mainIndex").value)-1;
 mainIndex=Math.max(0,Math.min(mainIndex,files.length-1));
-
 if(files.length===0)return;
 
 let uploadedUrls=[];
 
 for(let i=0;i<files.length;i++){
-
 const file=files[i];
 const safeName=file.name.replace(/\s/g,"_");
 const fileName=`${Date.now()}_${safeName}`;
-
 const { error }=await supabase.storage.from('images').upload(fileName,file);
-
-if(error){
-console.error(error);
-continue;
-}
-
+if(error){ console.error(error); continue; }
 const { data }=supabase.storage.from('images').getPublicUrl(fileName);
 uploadedUrls.push(data.publicUrl);
 }
 
-await supabase.from("projects").insert([
-{
-images:uploadedUrls,
-main_index:mainIndex
-}
-]);
-
+await supabase.from("projects").insert([{ images:uploadedUrls, main_index:mainIndex }]);
 createProjectItem(uploadedUrls,mainIndex);
 }
 
@@ -300,23 +280,15 @@ applyImages();
 });
 
 window.addEventListener("DOMContentLoaded",async()=>{
-
 const { data,error }=await supabase
 .from("projects")
 .select("*")
 .order("created_at",{ascending:false});
-
-if(error){
-console.error(error);
-return;
-}
-
+if(error){ console.error(error); return; }
 data.forEach(project=>{
 createProjectItem(project.images,project.main_index);
 });
-
 });
-
 </script>
 
 <img src="logonew.png" id="floatingLogo">
