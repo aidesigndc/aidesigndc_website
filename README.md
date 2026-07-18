@@ -1,1 +1,1 @@
-aidesigndc.net Website for Chang Soo Rhee. Managed and Built by HATE_G10
+aidesigndc.net Porfolio Website for A&I Design LLC. Managed and Built by HATE_G10
